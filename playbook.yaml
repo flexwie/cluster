@@ -10,12 +10,11 @@
           community.general.homebrew:
             name: "{{ item }}"
             state: present
-          with:
-            item:
-              - argocd
-              - kubectl
-              - tailscale
-              - terraform
+          with_items:
+            - argocd
+            - kubectl
+            - tailscale
+            - terraform
         - name: Configure kubeconfig
           ansible.builtin.shell:
             cmd: tailscale configure kubeconfig tailscale-operator
