@@ -1,0 +1,73 @@
+---
+- name: Configure k3s
+  hosts: localhost
+  tasks:
+    - name: Host setup
+      tags:
+        - setup
+      block:
+        - name: Install packages
+          community.general.homebrew:
+            name: "{{ item }}"
+            state: present
+          with:
+            item:
+              - argocd
+              - kubectl
+              - tailscale
+              - terraform
+        - name: Configure kubeconfig
+          ansible.builtin.shell:
+            cmd: tailscale configure kubeconfig tailscale-operator
+    - name: ArgoCD
+      tags:
+        - argo
+      block:
+        - name: Create ArgoCD namespace
+          kubernetes.core.k8s:
+            name: argocd
+            api_version: v1
+            kind: Namespace
+            state: present
+        - name: Get definition
+          ansible.builtin.get_url:
+            url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+            dest: ./argocd.yml
+            mode: "0777"
+        - name: Install ArgoCD
+          kubernetes.core.k8s:
+            src: ./argocd.yml
+            namespace: argocd
+            state: present
+        - name: Remove definition
+          ansible.builtin.file:
+            path: ./argocd.yml
+            state: absent
+        - name: Patch LoadBalancer
+          kubernetes.core.k8s_json_patch:
+            kind: Service
+            namespace: argocd
+            name: argocd-server
+            patch:
+              - op: add
+                path: /spec/loadBalancerClass
+                value: tailscale
+              - op: replace
+                path: /spec/type
+                value: LoadBalancer
+        - name: Deploy app
+          kubernetes.core.k8s:
+            apiVersion: argoproj.io/v1alpha1
+            kind: Application
+            metadata:
+              name: guestbook
+              namespace: argocd
+            spec:
+              project: default
+              source:
+                repoURL: https://github.com/flexwie/vps.git
+                targetRevision: HEAD
+                path: apps
+              destination:
+                server: https://kubernetes.default.svc
+                namespace: apps

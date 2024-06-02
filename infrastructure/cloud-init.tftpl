@@ -1,0 +1,59 @@
+#cloud-config
+# The above header must generally appear on the first line of a cloud config
+# file, but all other lines that begin with a # are optional comments.
+
+runcmd:
+  # One-command install, from https://tailscale.com/download/
+  - ["sh", "-c", "curl -fsSL https://tailscale.com/install.sh | sh"]
+  # Set sysctl settings for IP forwarding (useful when configuring an exit node)
+  - [
+      "sh",
+      "-c",
+      "echo 'net.ipv4.ip_forward = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && echo 'net.ipv6.conf.all.forwarding = 1' | sudo tee -a /etc/sysctl.d/99-tailscale.conf && sudo sysctl -p /etc/sysctl.d/99-tailscale.conf",
+    ]
+  # Authenticate with Tailscale
+  - ["tailscale", "up", "--authkey=${authkey}"]
+  # (Optional) Include this line to make this node available over Tailscale SSH
+  - ["tailscale", "set", "--ssh"]
+  # Update and upgrade apt cache
+  - ["sudo", "apt", "update"]
+  - ["sudo", "apt", "upgrade", "-y"]
+  # install k3s
+  - curl -sfL https://get.k3s.io | sh -
+  - ["export", "KUBECONFIG=/etc/rancher/k3s/k3s.yaml"]
+  # install helm
+  - curl https://raw.githubusercontent.com/helm/helm/main/scripts/get-helm-3 | bash
+  # add tailscale repo and install operator
+  - [
+      "helm",
+      "repo",
+      "add",
+      "tailscale",
+      "https://pkgs.tailscale.com/helmcharts",
+    ]
+  - ["helm", "repo", "update"]
+  - [
+      "helm",
+      "upgrade",
+      "--install",
+      "tailscale-operator",
+      "tailscale/tailscale-operator",
+      "--namespace=tailscale",
+      "--create-namespace",
+      "--set-string",
+      "oauth.clientId=${tailscale_client_id}",
+      "--set-string",
+      "oauth.clientSecret=${tailscale_client_secret}",
+      "--set-string",
+      'apiServerProxyConfig.mode="true"',
+      "--wait",
+    ]
+  # create admin clusterrole for tailscale admin
+  - [
+      "kubectl",
+      "create",
+      "clusterrolebinding",
+      "tailnet-admins",
+      '--group="tag:k8s-admin"',
+      "--clusterrole=cluster-admin",
+    ]

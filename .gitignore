@@ -1,0 +1,4 @@
+**/*.lock.hcl
+infrastructure/.terraform
+**/*.tfvars
+**/*.tfstate*
