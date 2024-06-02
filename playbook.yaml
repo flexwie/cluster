@@ -56,17 +56,19 @@
                 value: LoadBalancer
         - name: Deploy app
           kubernetes.core.k8s:
-            apiVersion: argoproj.io/v1alpha1
-            kind: Application
-            metadata:
-              name: guestbook
-              namespace: argocd
-            spec:
-              project: default
-              source:
-                repoURL: https://github.com/flexwie/vps.git
-                targetRevision: HEAD
-                path: apps
-              destination:
-                server: https://kubernetes.default.svc
-                namespace: apps
+            state: present
+            definition:
+              apiVersion: argoproj.io/v1alpha1
+              kind: Application
+              metadata:
+                name: guestbook
+                namespace: argocd
+              spec:
+                project: default
+                source:
+                  repoURL: https://github.com/flexwie/cluster.git
+                  targetRevision: HEAD
+                  path: apps
+                destination:
+                  server: https://kubernetes.default.svc
+                  namespace: apps
