@@ -1,0 +1,12 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: synology-csi
+spec:
+  project: default
+  source:
+    chart: synology-csi-chart/synology-csi
+    repoURL: https://christian-schlichtherle.github.io/synology-csi-chart
+  destination:
+    name: "in-cluster"
+    namespace: synology-csi
