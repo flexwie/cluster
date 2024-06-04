@@ -42,18 +42,17 @@
           ansible.builtin.file:
             path: ./argocd.yml
             state: absent
-        - name: Patch LoadBalancer
+        - name: Patch server configuration
           kubernetes.core.k8s_json_patch:
-            kind: Service
+            kind: ConfigMap
             namespace: argocd
-            name: argocd-server
+            name: argocd-cmd-params-cm
             patch:
               - op: add
-                path: /spec/loadBalancerClass
-                value: tailscale
-              - op: replace
-                path: /spec/type
-                value: LoadBalancer
+                path: "/data/server.insecure"
+                value: "true"
+        - name: Rollout deployment
+          shell: /bin/bash -c "kubectl rollout restart deployment argocd-server -n argocd"
         - name: Deploy app
           kubernetes.core.k8s:
             state: present
@@ -61,7 +60,7 @@
               apiVersion: argoproj.io/v1alpha1
               kind: Application
               metadata:
-                name: guestbook
+                name: app-of-apps
                 namespace: argocd
               spec:
                 project: default
@@ -72,3 +71,22 @@
                 destination:
                   server: https://kubernetes.default.svc
                   namespace: apps
+        - name: Add ingress
+          kubernetes.core.k8s:
+            state: present
+            definition:
+              apiVersion: networking.k8s.io/v1
+              kind: Ingress
+              metadata:
+                name: argocd-server-ingress
+                namespace: argocd
+              spec:
+                ingressClassName: tailscale
+                defaultBackend:
+                  service:
+                    name: argocd-server
+                    port:
+                      name: http
+                tls:
+                  - hosts:
+                      - argocd
