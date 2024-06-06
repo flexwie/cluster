@@ -32,28 +32,6 @@ runcmd:
       "https://pkgs.tailscale.com/helmcharts",
     ]
   - ["helm", "repo", "update"]
-  - [
-      "helm",
-      "upgrade",
-      "--install",
-      "tailscale-operator",
-      "tailscale/tailscale-operator",
-      "--namespace=tailscale",
-      "--create-namespace",
-      "--set-string",
-      "oauth.clientId=${tailscale_client_id}",
-      "--set-string",
-      "oauth.clientSecret=${tailscale_client_secret}",
-      "--set-string",
-      'apiServerProxyConfig.mode="true"',
-      "--wait",
-    ]
+  - helm upgrade --install tailscale-operator tailscale/tailscale-operator --namespace=tailscale --create-namespace --set-string oauth.clientId=${tailscale_client_id} --set-string oauth.clientSecret=${tailscale_client_secret} --set-string apiServerProxyConfig.mode="true" --wait
   # create admin clusterrole for tailscale admin
-  - [
-      "kubectl",
-      "create",
-      "clusterrolebinding",
-      "tailnet-admins",
-      '--group="tag:k8s-admin"',
-      "--clusterrole=cluster-admin",
-    ]
+  - kubectl create clusterrolebinding tailnet-admins --group=tag:k8s-admin" --clusterrole=cluster-admin
