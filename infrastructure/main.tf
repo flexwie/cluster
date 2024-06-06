@@ -22,8 +22,6 @@ resource "hcloud_server" "node1" {
     ipv4_enabled = true
   }
 
-  shutdown_before_deletion = true
-
   ssh_keys  = [data.hcloud_ssh_key.macbook.id]
   user_data = templatefile("cloud-init.tftpl", { authkey = tailscale_tailnet_key.join_key.key, tailscale_client_id = var.tailscale_client_id, tailscale_client_secret = var.tailscale_client_secret })
 }
