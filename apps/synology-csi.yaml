@@ -12,3 +12,6 @@ spec:
   destination:
     name: "in-cluster"
     namespace: synology-csi
+  syncPolicy:
+    syncOptions:
+      - CreateNamespace=true
