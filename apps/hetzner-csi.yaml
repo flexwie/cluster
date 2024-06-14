@@ -1,25 +1,65 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: csi-driver-smb
-  namespace: argocd
+    name: csi-driver-smb
+    namespace: argocd
 spec:
-  project: default
-  source:
-    helm:
-      chart: hcloud-csi
-      repoURL: https://charts.hetzner.cloud
-      targetRevision: 2.7.1
-  destination:
-    name: "in-cluster"
-    namespace: kube-system
-  syncPolicy:
-    automated: {}
+    project: default
+    source:
+        helm:
+            chart: hcloud-csi
+            repoURL: https://charts.hetzner.cloud
+            targetRevision: 2.7.1
+    destination:
+        name: in-cluster
+        namespace: kube-system
+    syncPolicy:
+        automated: {}
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jcg2ysz5zladh9ewwlyrurk99uw45r0k8tm2rg7p09ca6yefxq8qkyw5ac
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZMUQ5VUVmZnVMSW56UFli
+            TCtiVlN4QWdHd01mejFRay9YY2FhL1k4d0FBCkRhNjlaVUdESUVDeG82NU9CcFk3
+            TklZS0szb0wzdkVsOFhNYlIvUUhyZjgKLS0tIGpqVklnajc2UzB5UjBRN0FQaVdL
+            MTM1ZzlOUkNpRWtBMUowTVJpZGJsUDAKzhdaut1USIUJGXbojIrRrcFoQ9Kjso20
+            0lWa+8Me3if2xBqKL2r3dzoYyx6CNdSzuQ/FE9hazhAkNp6oCOa7qg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-06-14T12:16:47Z"
+    mac: ENC[AES256_GCM,data:Np+PSKlceolQkhoM3FRGyYai1ixNFhNWA06NJBL3mbUHmsL7vmrrY+TOagMnHBXsNCsO3uv8OTTCUMqPLIcjk16fqOdQDVk8aYmK9K5d0k90mUnCxsiPYcafkcnW+pqBary4tPQpcJ6OEgQHcZRFYscKn+sh9UzAqiF3/ZyyntM=,iv:cBZvqGKdPsWd6h+HzYq45LFbaHeuh7FBON65HRFgtkg=,tag:L3Z/eWLikUtrJIwJNWgNKw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password)$
+    version: 3.8.1
 ---
 apiVersion: 1
 kind: Secret
 metadata:
-  name: hcloud
-  namespace: kube-system
+    name: hcloud
+    namespace: kube-system
 stringData:
-  token: test
+    token: testdata
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jcg2ysz5zladh9ewwlyrurk99uw45r0k8tm2rg7p09ca6yefxq8qkyw5ac
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSBZMUQ5VUVmZnVMSW56UFli
+            TCtiVlN4QWdHd01mejFRay9YY2FhL1k4d0FBCkRhNjlaVUdESUVDeG82NU9CcFk3
+            TklZS0szb0wzdkVsOFhNYlIvUUhyZjgKLS0tIGpqVklnajc2UzB5UjBRN0FQaVdL
+            MTM1ZzlOUkNpRWtBMUowTVJpZGJsUDAKzhdaut1USIUJGXbojIrRrcFoQ9Kjso20
+            0lWa+8Me3if2xBqKL2r3dzoYyx6CNdSzuQ/FE9hazhAkNp6oCOa7qg==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-06-14T12:16:47Z"
+    mac: ENC[AES256_GCM,data:Np+PSKlceolQkhoM3FRGyYai1ixNFhNWA06NJBL3mbUHmsL7vmrrY+TOagMnHBXsNCsO3uv8OTTCUMqPLIcjk16fqOdQDVk8aYmK9K5d0k90mUnCxsiPYcafkcnW+pqBary4tPQpcJ6OEgQHcZRFYscKn+sh9UzAqiF3/ZyyntM=,iv:cBZvqGKdPsWd6h+HzYq45LFbaHeuh7FBON65HRFgtkg=,tag:L3Z/eWLikUtrJIwJNWgNKw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password)$
+    version: 3.8.1
