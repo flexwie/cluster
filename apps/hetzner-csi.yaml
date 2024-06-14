@@ -6,11 +6,20 @@ metadata:
 spec:
   project: default
   source:
-    chart: csi-driver-smb
-    repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-smb/master/charts
-    targetRevision: 1.14.0
+    helm:
+      chart: hcloud-csi
+      repoURL: https://charts.hetzner.cloud
+      targetRevision: 2.7.1
   destination:
     name: "in-cluster"
     namespace: kube-system
   syncPolicy:
     automated: {}
+---
+apiVersion: 1
+kind: Secret
+metadata:
+  name: hcloud
+  namespace: kube-system
+stringData:
+  token: test

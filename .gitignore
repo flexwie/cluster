@@ -2,3 +2,4 @@
 infrastructure/.terraform
 **/*.tfvars
 **/*.tfstate*
+age-key.txt
