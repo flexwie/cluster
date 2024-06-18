@@ -1,0 +1,35 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: <insert-namespace-name-here>
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hetzner-csi
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: hcloud-csi
+    repoURL: https://charts.hetzner.cloud
+    targetRevision: 2.7.1
+  destination:
+    name: "in-cluster"
+    namespace: kube-system
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: monica
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/flexwie/cluster.git
+    targetRevision: HEAD
+    path: apps/monica
+  destination:
+    server: https://kubernetes.default.svc
