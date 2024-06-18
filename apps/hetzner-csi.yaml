@@ -1,0 +1,16 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: hetzner-csi
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: hcloud-csi
+    repoURL: https://charts.hetzner.cloud
+    targetRevision: 2.7.1
+  destination:
+    name: "in-cluster"
+    namespace: kube-system
+  syncPolicy:
+    automated: {}
