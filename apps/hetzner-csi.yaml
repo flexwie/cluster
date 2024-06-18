@@ -6,10 +6,9 @@ metadata:
 spec:
     project: default
     source:
-        helm:
-            chart: hcloud-csi
-            repoURL: https://charts.hetzner.cloud
-            targetRevision: 2.7.1
+        chart: hcloud-csi
+        repoURL: https://charts.hetzner.cloud
+        targetRevision: 2.7.1
     destination:
         name: in-cluster
         namespace: kube-system
@@ -24,14 +23,14 @@ sops:
         - recipient: age1jcg2ysz5zladh9ewwlyrurk99uw45r0k8tm2rg7p09ca6yefxq8qkyw5ac
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSB2L0JOajdONjJ5eTIzVkpa
-            UExYc3FTWWlVWkh4R1Y0Uzd2Y1NrWHpVL2g0Cm94KzhNZm95UXR0Wnlzd05lQ2tZ
-            RWpLc0RLK2JMOXg2c1FsbzI3anROV2cKLS0tIGtmbUNlWEE1NnErM3czek82dFo4
-            amM4QzlPVDZJVXhwNTQxY09xMVdNREUKWF2kPEyi1x4Ls0Q/AWNr6KpNmqsfXyJK
-            eGCXas5ip7K38M1D0LSfUkgwjFhiJmgD1MOhD1Lus38tdIhZ1kvsCg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzTTViRVpUaGtlK0o4czR4
+            UWsxMnArWlJRTnlsR3RHcC9TMTZHZ01GREhjCjhqM3JZOXdJaXJISnYwcHNoVWdk
+            K2JCWWJneVdjekdpb2NudHVhaGJUUTgKLS0tIGt4c0F5VGNFNlQxYlFYOTVXakVq
+            MWI1QWJ2WTc2R2tsMUFlNm10OStvYVEKQhSA3i/W9f+7c6+PLXnoVOr1JFDCZLwM
+            Kc/KQNL7LO7oFp3hXHoS/NAfEtlb8dAxbh5ZUDBp31CwEwSnVSDxZg==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-06-18T17:08:51Z"
-    mac: ENC[AES256_GCM,data:f0Vp47Ggru/+6J8qRZAibWlTl9CFYwHKZ3nBtz+tSmIkeKnZHHCcfLNA18YH6kXFwp3xGrs1X/uf25wTSANWSAlYehIcpxDJNt8ktJtxsjTadB7Z7+hOwtBXVw32a7FwdsXDpgpMCU3X2jg4xk8QM+bIABbbSM8lCMcK1TCnvPs=,iv:HrK17o/7WUEkVfwh5s0H32zbE4H3R2Vljd9XpWJJRXI=,tag:zcORHv1Szw+vb56WMZca+A==,type:str]
+    lastmodified: "2024-06-18T17:09:50Z"
+    mac: ENC[AES256_GCM,data:Yiz1WHDBT9uZPzyfv1Q0UAyfLzBTQd376BDsaOy9vmBKBPUM94YlZUpSExKJcw2JN2rxuEudgqBzGRGjvmrJP0VzY+J2gYb085IHn1dUrOAkIB14ueDSUdf/sC5hwPCOzYhByLrlZb+GmYGlg7X3A7QA/eyXPaaFPDY1lm0oj0s=,iv:73lKAqFsJ6NreGsRidNSc/qK/9Mn3Hrgi4xZdObiY9o=,tag:TtnVEwxmeav572faovDeUw==,type:str]
     pgp: []
     encrypted_regex: ^(user|password|token|secret)$
     version: 3.8.1
