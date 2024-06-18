@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-    name: csi-driver-smb
+    name: hetzner-csi
     namespace: argocd
 spec:
     project: default
@@ -23,14 +23,14 @@ sops:
         - recipient: age1jcg2ysz5zladh9ewwlyrurk99uw45r0k8tm2rg7p09ca6yefxq8qkyw5ac
           enc: |
             -----BEGIN AGE ENCRYPTED FILE-----
-            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzTTViRVpUaGtlK0o4czR4
-            UWsxMnArWlJRTnlsR3RHcC9TMTZHZ01GREhjCjhqM3JZOXdJaXJISnYwcHNoVWdk
-            K2JCWWJneVdjekdpb2NudHVhaGJUUTgKLS0tIGt4c0F5VGNFNlQxYlFYOTVXakVq
-            MWI1QWJ2WTc2R2tsMUFlNm10OStvYVEKQhSA3i/W9f+7c6+PLXnoVOr1JFDCZLwM
-            Kc/KQNL7LO7oFp3hXHoS/NAfEtlb8dAxbh5ZUDBp31CwEwSnVSDxZg==
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSAzbXArOXNFbzR1TXNkc2RK
+            UTRKMmVnR1hEdUlxMUNGcnR1YTdSVG9ROTF3CnBnSnhUL0psWmpsMUcwSGdBNERa
+            L2ZUNHk2UDlaSW9yU3dKK2ZHZzhlR0kKLS0tIGNSQVlzczhSMG52cExySWJBQ2Vi
+            M2xJc1BYK2F4cEdFM1BTTnhVMm53aGcKRBy3SWNRKNkOiz+PqoqT8MxHOBUwWwEH
+            3HKACcxgy5vy/X1DJ6rnTDCArciP1YS4kS94tEw8aZ144Rya2JOmuQ==
             -----END AGE ENCRYPTED FILE-----
-    lastmodified: "2024-06-18T17:09:50Z"
-    mac: ENC[AES256_GCM,data:Yiz1WHDBT9uZPzyfv1Q0UAyfLzBTQd376BDsaOy9vmBKBPUM94YlZUpSExKJcw2JN2rxuEudgqBzGRGjvmrJP0VzY+J2gYb085IHn1dUrOAkIB14ueDSUdf/sC5hwPCOzYhByLrlZb+GmYGlg7X3A7QA/eyXPaaFPDY1lm0oj0s=,iv:73lKAqFsJ6NreGsRidNSc/qK/9Mn3Hrgi4xZdObiY9o=,tag:TtnVEwxmeav572faovDeUw==,type:str]
+    lastmodified: "2024-06-18T17:13:34Z"
+    mac: ENC[AES256_GCM,data:cA2khuOdmtTngOj+wgaPcx1wVmqv+ddZQyy9hbP/1VI+vKGdyky1ehvUEw7qE8glmTAcS8wXehPr5MmXW1fdA0XK2MeyZU4RU2E3C9uwgCV1z6f2knZj4kSYrgMYBt2CUdcqC2522/ocw0G24LOgPZfYReMw7H0rRCRcMv3iPnM=,iv:uMDk7XlqIwvfQFsloJwtFOoaIl+j4oQDZyQr0+f4a0M=,tag:a1lGjn/Fg6gzqD0DJ7ecIg==,type:str]
     pgp: []
     encrypted_regex: ^(user|password|token|secret)$
     version: 3.8.1
