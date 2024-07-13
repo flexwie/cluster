@@ -44,18 +44,22 @@ spec:
           consume:
             enabled: true
             storageClass: local-path
+            accessMode: ReadWriteOnce
             size: 1Gi
           data:
             enabled: true
             storageClass: local-path
+            accessMode: ReadWriteOnce
             size: 4Gi
           export:
             enabled: true
             storageClass: local-path
+            accessMode: ReadWriteOnce
             size: 4Gi
           media:
             enabled: true
             storageClass: local-path
+            accessMode: ReadWriteOnce
             size: 4Gi
   destination:
     name: "in-cluster"
