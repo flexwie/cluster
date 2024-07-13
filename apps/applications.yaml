@@ -23,13 +23,42 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: monica
+  name: paperless-ngx
   namespace: argocd
 spec:
   project: default
   source:
-    repoURL: https://github.com/flexwie/cluster.git
-    targetRevision: HEAD
-    path: apps/monica
+    chart: paperless-ngx
+    repoURL: https://charts.gabe565.com
+    targetRevision: 0.18.1
+    helm:
+      valuesObject:
+        postgresql:
+          enabled: true
+          primary:
+            persistence:
+              enabled: true
+              storageClass: local-path
+              size: 4Gi
+        persistence:
+          consume:
+            enabled: true
+            storageClass: local-path
+            size: 1Gi
+          data:
+            enabled: true
+            storageClass: local-path
+            size: 4Gi
+          export:
+            enabled: true
+            storageClass: local-path
+            size: 4Gi
+          media:
+            enabled: true
+            storageClass: local-path
+            size: 4Gi
   destination:
-    server: https://kubernetes.default.svc
+    name: "in-cluster"
+    namespace: apps
+  syncPolicy:
+    automated: {}
