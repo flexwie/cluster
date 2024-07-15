@@ -1,0 +1,18 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: paperless-ngx
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: node-red
+    repoURL: https://schwarzit.github.io/node-red-chart/
+    targetRevision: 0.32.1
+  destination:
+    name: "in-cluster"
+    namespace: apps
+  syncPolicy:
+    automated: {}
+---
+
