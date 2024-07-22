@@ -6,14 +6,14 @@ metadata:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: hetzner-csi
+  name: nfs-csi
   namespace: argocd
 spec:
   project: default
   source:
-    chart: hcloud-csi
-    repoURL: https://charts.hetzner.cloud
-    targetRevision: 2.7.1
+    chart: csi-driver-nfs
+    repoURL: https://raw.githubusercontent.com/kubernetes-csi/csi-driver-nfs/master/charts
+    targetRevision: v4.7.0
   destination:
     name: "in-cluster"
     namespace: kube-system
@@ -55,7 +55,7 @@ spec:
         persistence:
           consume:
             enabled: true
-            storageClass: local-path
+            storageClass: nfs-csi-retain
             accessMode: ReadWriteOnce
             size: 1Gi
           data:
