@@ -1,0 +1,23 @@
+- name: Check if in repo
+  shell:
+    cmd: git rev-parse --is-inside-work-tree
+  register: is_git
+  failed_when: "is_git.stdout != 'true'"
+- name: Update smudge
+  git_config:
+    scope: local
+    name: filter.sops.smudge
+    value: scripts/decrypt.sh
+    repo: .
+- name: Update clean
+  git_config:
+    scope: local
+    name: filter.sops.clean
+    value: scripts/encrypt.sh
+    repo: .
+- name: Update required
+  git_config:
+    scope: local
+    name: filter.sops.required
+    value: true
+    repo: .

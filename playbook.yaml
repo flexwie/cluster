@@ -20,6 +20,12 @@
         - name: Configure kubeconfig
           ansible.builtin.shell:
             cmd: tailscale configure kubeconfig tailscale-operator
+    - name: Setup SOPS and age
+      ansible.builtin.include_tasks:
+        file: tasks/age.yaml
+    - name: Setup git
+      ansible.builtin.include_tasks:
+        file: tasks/git.yaml
     - name: ArgoCD
       tags:
         - argo

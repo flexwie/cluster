@@ -1,0 +1,29 @@
+- name: Check for age private key
+  stat:
+    path: age-key.txt
+  register: age_key
+- name: Create age key
+  when: not age_key.stat.exists
+  block:
+    - name: Create key
+      shell:
+        cmd: age-keygen -o age-key.txt
+    - name: Add private key to gitignore
+      lineinfile:
+        path: .gitignore
+        line: age-key.txt
+        create: true
+    - name: Read public key
+      shell:
+        cmd: age-keygen -y age-key.txt
+      register: public_key
+    - name: Add public keyto recipients
+      lineinfile:
+        path: public-age-keys.txt
+        line: "{{ public_key.stdout }}"
+        create: true
+    - name: Add recipients to .envrc
+      lineinfile:
+        path: .envrc
+        line: "SOPS_AGE_RECIPIENTS=$(<public-age-keys.txt)"
+        create: true
