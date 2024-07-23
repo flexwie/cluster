@@ -31,6 +31,15 @@ spec:
     chart: paperless-ngx
     repoURL: https://charts.gabe565.com
     targetRevision: 0.18.1
+    kustomize:
+      patches:
+        - target:
+            kind: PersistentVolumeClaim
+            name: paperless-ngx-consume
+          patch: |-
+            - op: replace
+              path: spec/volumeName
+              value: pvc-paperless-consume
     helm:
       valuesObject:
         env:
