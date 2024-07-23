@@ -23,6 +23,34 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
+  name: n8n
+  namespace: argocd
+spec:
+  project: default
+  source:
+    chart: n8n
+    repoURL: https://8gears.container-registry.com/library/n8n
+    targetRevision: 0.23.1
+    helm:
+      valuesObject:
+        config:
+          database:
+            type: sqlite
+        persistence:
+          enabled: true
+          storageClass: local-path
+          size: 1Gi
+        extraEnv:
+          WEBHOOK_TUNNEL_URL: https:///abc.hippo-cod.ts.net
+  destination:
+    name: "in-cluster"
+    namespace: kube-system
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
   name: paperless-ngx
   namespace: argocd
 spec:
