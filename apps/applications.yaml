@@ -29,8 +29,8 @@ spec:
   project: default
   source:
     chart: n8n
-    repoURL: https://8gears.container-registry.com/library/n8n
-    targetRevision: 0.23.1
+    repoURL: https://github.com/8gears/n8n-helm-chart
+    targetRevision: 0.24.4
     helm:
       valuesObject:
         config:
