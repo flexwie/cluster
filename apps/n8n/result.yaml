@@ -83,11 +83,11 @@ spec:
       containers:
         - env:
             - name: WEBHOOK_TUNNEL_URL
-              value: https://paperless.hippo-cod.ts.net
+              value: https://n8n.hippo-cod.ts.net
             - name: N8N_EDITOR_BASE_URL
-              value: https://paperless.hippo-cod.ts.net
+              value: https://n8n.hippo-cod.ts.net
             - name: N8N_HOST
-              value: paperless.hippo-cod.ts.net
+              value: n8n.hippo-cod.ts.net
             - name: N8N_PORT
               value: "5678"
             - name: N8N_CONFIG_FILES
