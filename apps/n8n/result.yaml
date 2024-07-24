@@ -120,8 +120,9 @@ spec:
         runAsNonRoot: true
         runAsUser: 1000
       volumes:
-        - emptyDir: {}
-          name: data
+        - name: data
+          persistentVolumeClaim:
+            claimName: n8n
         - configMap:
             name: n8n
           name: config-volume
