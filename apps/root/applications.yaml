@@ -1,0 +1,97 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: apps
+
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: common
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/flexwie/cluster.git
+    targetRevision: HEAD
+    path: apps/common
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: apps
+  syncPolicy:
+    automated: {}
+---
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: n8n
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/flexwie/cluster.git
+    targetRevision: HEAD
+    path: apps/n8n
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: apps
+  syncPolicy:
+    automated: {}
+# apiVersion: argoproj.io/v1alpha1
+# kind: Application
+# metadata:
+#   name: paperless-ngx
+#   namespace: argocd
+# spec:
+#   project: default
+#   source:
+#     chart: paperless-ngx
+#     repoURL: https://charts.gabe565.com
+#     targetRevision: 0.18.1
+#     helm:
+#       valuesObject:
+#         env:
+#           PAPERLESS_URL: https://paperless.hippo-cod.ts.net
+#           PAPERLESS_CSRF_TRUSTED_ORIGINS: https://paperless.hippo-cod.ts.net,https://paperless.felixwie.com
+#           PAPERLESS_TIME_ZONE: Europe/Berlin
+#           PAPERLESS_OCR_LANGUAGE: deu
+#           PAPERLESS_OCR_SKIP_ARCHIVE_FILE: with_text
+#           PAPERLESS_OCR_IMAGE_DPI: 300
+#           PAPERLESS_THREADS_PER_WORKER: 1
+#           PAPERLESS_CONSUMER_RECURSIVE: true
+#           PAPERLESS_CONSUMER_SUBDIRS_AS_TAGS: true
+#           PAPERLESS_CONSUMER_ENABLE_COLLATE_DOUBLE_SIDED: true
+#           PAPERLESS_APP_TITLE: paperless
+#         postgresql:
+#           enabled: true
+#           primary:
+#             persistence:
+#               enabled: true
+#               storageClass: local-path
+#               size: 4Gi
+#         persistence:
+#           consume:
+#             enabled: true
+#             storageClass: nfs-csi-retain
+#             accessMode: ReadWriteOnce
+#             size: 1Gi
+#           data:
+#             enabled: true
+#             storageClass: local-path
+#             accessMode: ReadWriteOnce
+#             size: 4Gi
+#           export:
+#             enabled: true
+#             storageClass: local-path
+#             accessMode: ReadWriteOnce
+#             size: 4Gi
+#           media:
+#             enabled: true
+#             storageClass: local-path
+#             accessMode: ReadWriteOnce
+#             size: 4Gi
+#   destination:
+#     name: "in-cluster"
+#     namespace: apps
+#   syncPolicy:
+#     automated: {}
