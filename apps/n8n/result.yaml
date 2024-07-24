@@ -115,7 +115,6 @@ spec:
         runAsGroup: 1000
         runAsNonRoot: true
         runAsUser: 1000
-      serviceAccountName: n8n
       volumes:
         - emptyDir: {}
           name: data
