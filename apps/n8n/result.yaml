@@ -52,7 +52,7 @@ spec:
   resources:
     requests:
       storage: 1Gi
-  storageClassName: local-path
+  storageClassName: nfs-csi-retain
 ---
 apiVersion: apps/v1
 kind: Deployment
