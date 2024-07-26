@@ -12,7 +12,7 @@ spec:
     helm:
       valuesObject:
         metrics:
-          enabled: true
+          enabled: false
   destination:
     server: https://kubernetes.default.svc
     namespace: apps
