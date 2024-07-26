@@ -1,20 +1,154 @@
-apiVersion: argoproj.io/v1alpha1
-kind: Application
+apiVersion: v1
+kind: PersistentVolumeClaim
 metadata:
-  name: mariadb
-  namespace: argocd
+    name: mariadb-pvc
 spec:
-  project: default
-  source:
-    chart: mariadb-operator
-    repoURL: https://helm.mariadb.com/mariadb-operator
-    targetRevision: 0.29.0
-    helm:
-      valuesObject:
-        metrics:
-          enabled: false
-  destination:
-    server: https://kubernetes.default.svc
-    namespace: apps
-  syncPolicy:
-    automated: {}
+    accessModes:
+        - ReadWriteOnce
+    resources:
+        requests:
+            storage: 1Gi
+    storageClassName: local-path
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jgqwu49ra5m5553fj747mmtzkkn5dduwrwad0l5jm934znpp9vgsxh4yd0
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2SzZBdG12OUVnWExDUUdD
+            QWJGTVhneE9Edk4vMGpYRkFkRTk3NEhxUENjClJKUUthNTNFejlyTzkreHhtWHd5
+            TmFySGs4ZnlPRnpxUWdQK2YyaDlqYlEKLS0tIHlZMERFKzRUQ1VYVVZudWtLSnI5
+            NE9RVXlZcG9Pa2xoZW5BbnNjRk51THMK1hQGExVOENJousnkzRig1Tsn6Slugc4B
+            hXioBG4jspCZr5ydwJv2CJrD9XAbSh2WhCDDH6ycmICi20/3Qak9/g==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-07-26T12:47:08Z"
+    mac: ENC[AES256_GCM,data:+mjeCyh2nQjdEFgH2BHvfmqOdhVb1KWIJ1zeeDXxd4oMPz0tFa9Hm26UxvBlUZRgeB/BXMRAHglsTDcOQ28YhyAw43QQUsXtgLRubn54jwQoIXmQtRZB61qbjlYuJ/g6F48g7tfyfLWYrNRNERlhghtXY6FOoj/rlHTxatJTVwc=,iv:87jMCiHW03Oe0KQy1uTIdIJq6pR6z/I5WhCYM7oVY1o=,tag:4GzQjsiJCcmkRlLqwZsUlw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password|token|secret)$
+    version: 3.8.1
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+    name: mariadb
+spec:
+    serviceName: mariadb
+    replicas: 1
+    selector:
+        matchLabels:
+            app: mariadb
+    template:
+        metadata:
+            labels:
+                app: mariadb
+        spec:
+            containers:
+                - name: mariadb
+                  image: mariadb:latest
+                  env:
+                    - name: MYSQL_ROOT_PASSWORD
+                      valueFrom:
+                        secretKeyRef:
+                            name: mariadb_root_pwd
+                            key: password
+                  ports:
+                    - containerPort: 3306
+                      name: sql
+                  volumeMounts:
+                    - mountPath: /var/lib/mysql
+                      name: mariadb-storage
+    volumeClaimTemplates:
+        - metadata:
+            name: mariadb-storage
+          spec:
+            accessModes:
+                - ReadWriteOnce
+            resources:
+                requests:
+                    storage: 1Gi
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jgqwu49ra5m5553fj747mmtzkkn5dduwrwad0l5jm934znpp9vgsxh4yd0
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2SzZBdG12OUVnWExDUUdD
+            QWJGTVhneE9Edk4vMGpYRkFkRTk3NEhxUENjClJKUUthNTNFejlyTzkreHhtWHd5
+            TmFySGs4ZnlPRnpxUWdQK2YyaDlqYlEKLS0tIHlZMERFKzRUQ1VYVVZudWtLSnI5
+            NE9RVXlZcG9Pa2xoZW5BbnNjRk51THMK1hQGExVOENJousnkzRig1Tsn6Slugc4B
+            hXioBG4jspCZr5ydwJv2CJrD9XAbSh2WhCDDH6ycmICi20/3Qak9/g==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-07-26T12:47:08Z"
+    mac: ENC[AES256_GCM,data:+mjeCyh2nQjdEFgH2BHvfmqOdhVb1KWIJ1zeeDXxd4oMPz0tFa9Hm26UxvBlUZRgeB/BXMRAHglsTDcOQ28YhyAw43QQUsXtgLRubn54jwQoIXmQtRZB61qbjlYuJ/g6F48g7tfyfLWYrNRNERlhghtXY6FOoj/rlHTxatJTVwc=,iv:87jMCiHW03Oe0KQy1uTIdIJq6pR6z/I5WhCYM7oVY1o=,tag:4GzQjsiJCcmkRlLqwZsUlw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password|token|secret)$
+    version: 3.8.1
+---
+apiVersion: v1
+kind: Secret
+metadata:
+    name: mariadb_root_pwd
+type: Opaque
+data:
+    password: ENC[AES256_GCM,data:nbJjxWIiCdc=,iv:z8lrYTqsxQSKEW7irEPYkigI9LzQQDg6IuTGeXY+Yt8=,tag:UBfNYsGCLmWotc8ZEXSShA==,type:str]
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jgqwu49ra5m5553fj747mmtzkkn5dduwrwad0l5jm934znpp9vgsxh4yd0
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2SzZBdG12OUVnWExDUUdD
+            QWJGTVhneE9Edk4vMGpYRkFkRTk3NEhxUENjClJKUUthNTNFejlyTzkreHhtWHd5
+            TmFySGs4ZnlPRnpxUWdQK2YyaDlqYlEKLS0tIHlZMERFKzRUQ1VYVVZudWtLSnI5
+            NE9RVXlZcG9Pa2xoZW5BbnNjRk51THMK1hQGExVOENJousnkzRig1Tsn6Slugc4B
+            hXioBG4jspCZr5ydwJv2CJrD9XAbSh2WhCDDH6ycmICi20/3Qak9/g==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-07-26T12:47:08Z"
+    mac: ENC[AES256_GCM,data:+mjeCyh2nQjdEFgH2BHvfmqOdhVb1KWIJ1zeeDXxd4oMPz0tFa9Hm26UxvBlUZRgeB/BXMRAHglsTDcOQ28YhyAw43QQUsXtgLRubn54jwQoIXmQtRZB61qbjlYuJ/g6F48g7tfyfLWYrNRNERlhghtXY6FOoj/rlHTxatJTVwc=,iv:87jMCiHW03Oe0KQy1uTIdIJq6pR6z/I5WhCYM7oVY1o=,tag:4GzQjsiJCcmkRlLqwZsUlw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password|token|secret)$
+    version: 3.8.1
+---
+apiVersion: v1
+kind: Service
+metadata:
+    name: mariadb
+    labels:
+        app: mariadb
+spec:
+    type: ClusterIP
+    selector:
+        app: mariadb
+    ports:
+        - port: 3306
+          protocol: TCP
+    clusterIP: None
+sops:
+    kms: []
+    gcp_kms: []
+    azure_kv: []
+    hc_vault: []
+    age:
+        - recipient: age1jgqwu49ra5m5553fj747mmtzkkn5dduwrwad0l5jm934znpp9vgsxh4yd0
+          enc: |
+            -----BEGIN AGE ENCRYPTED FILE-----
+            YWdlLWVuY3J5cHRpb24ub3JnL3YxCi0+IFgyNTUxOSA2SzZBdG12OUVnWExDUUdD
+            QWJGTVhneE9Edk4vMGpYRkFkRTk3NEhxUENjClJKUUthNTNFejlyTzkreHhtWHd5
+            TmFySGs4ZnlPRnpxUWdQK2YyaDlqYlEKLS0tIHlZMERFKzRUQ1VYVVZudWtLSnI5
+            NE9RVXlZcG9Pa2xoZW5BbnNjRk51THMK1hQGExVOENJousnkzRig1Tsn6Slugc4B
+            hXioBG4jspCZr5ydwJv2CJrD9XAbSh2WhCDDH6ycmICi20/3Qak9/g==
+            -----END AGE ENCRYPTED FILE-----
+    lastmodified: "2024-07-26T12:47:08Z"
+    mac: ENC[AES256_GCM,data:+mjeCyh2nQjdEFgH2BHvfmqOdhVb1KWIJ1zeeDXxd4oMPz0tFa9Hm26UxvBlUZRgeB/BXMRAHglsTDcOQ28YhyAw43QQUsXtgLRubn54jwQoIXmQtRZB61qbjlYuJ/g6F48g7tfyfLWYrNRNERlhghtXY6FOoj/rlHTxatJTVwc=,iv:87jMCiHW03Oe0KQy1uTIdIJq6pR6z/I5WhCYM7oVY1o=,tag:4GzQjsiJCcmkRlLqwZsUlw==,type:str]
+    pgp: []
+    encrypted_regex: ^(user|password|token|secret)$
+    version: 3.8.1
