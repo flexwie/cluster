@@ -6,7 +6,7 @@ metadata:
 spec:
   project: default
   source:
-    chart: mariadb-operator/mariadb-operator
+    chart: mariadb-operator
     repoURL: https://helm.mariadb.com/mariadb-operator
     targetRevision: 0.0.29
     helm:
