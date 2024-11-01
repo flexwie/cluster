@@ -11,10 +11,9 @@
             name: "{{ item }}"
             state: present
           with_items:
-            - argocd
+            - flux
             - kubectl
             - tailscale
-            - terraform
             - age
             - sops
             - kustomize
@@ -28,126 +27,29 @@
     - name: Setup git
       ansible.builtin.include_tasks:
         file: tasks/git.yaml
-    - name: ArgoCD
+    - name: Flux
       tags:
-        - argo
+        - flux
       block:
-        - name: Install ArgoCD
-          kubernetes.core.helm:
-            name: argo
-            chart_repo_url: "https://argoproj.github.io/argo-helm"
-            release_namespace: argocd
-            create_namespace: true
-            chart_ref: argo-cd
-            values:
-              params:
-                server.insecure: true
-              configs:
-                cm:
-                  kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
-
-              repoServer:
-                volumes:
-                  - name: custom-tools
-                    emptyDir: {}
-
-                initContainers:
-                  - name: install-ksops
-                    image: viaductoss/ksops:v4.3.2
-                    command: ["/bin/sh", "-c"]
-                    args:
-                      - echo "Installing KSOPS...";
-                        mv ksops /custom-tools/;
-                        mv kustomize /custom-tools/;
-                        echo "Done.";
-                    volumeMounts:
-                      - mountPath: /custom-tools
-                        name: custom-tools
-                volumeMounts:
-                  - mountPath: /usr/local/bin/kustomize
-                    name: custom-tools
-                    subPath: kustomize
-                  - mountPath: /usr/local/bin/ksops
-                    name: custom-tools
-                    subPath: ksops
-                # envFrom:
-                #   - secretRef:
-                #       name: test
-
-        # - name: Get definition
-        #   ansible.builtin.get_url:
-        #     url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-        #     dest: ./argocd.yml
-        #     mode: "0777"
-        # - name: Install ArgoCD
-        #   kubernetes.core.k8s:
-        #     src: ./argocd.yml
-        #     namespace: argocd
-        #     state: present
-        # - name: Remove definition
-        #   ansible.builtin.file:
-        #     path: ./argocd.yml
-        #     state: absent
-        # - name: Patch server configuration
-        #   kubernetes.core.k8s_json_patch:
-        #     kind: ConfigMap
-        #     namespace: argocd
-        #     name: argocd-cmd-params-cm
-        #     patch:
-        #       - op: add
-        #         path: "/data"
-        #         value: { "server.insecure": "true" }
-        #   register: config_patch
-        # - name: Enable Kustomize options
-        #   ansible.builtin.k8s:
-        #     state: present
-        #     definition:
-        #       apiVersion: v1
-        #       kind: ConfigMap
-        #       metadata:
-        #         name: argocd-cm
-        #         labels:
-        #           app.kubernetes.io/name: argocd-cm
-        #           app.kubernetes.io/part-of: argocd
-        #       data:
-        #         kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
-        # - name: Rollout deployment
-        #   shell: /bin/bash -c "kubectl rollout restart deployment argocd-server -n argocd"
-        #   when: config_patch.changed
-        - name: Deploy app
-          kubernetes.core.k8s:
-            state: present
-            definition:
-              apiVersion: argoproj.io/v1alpha1
-              kind: Application
-              metadata:
-                name: app-of-apps
-                namespace: argocd
-              spec:
-                project: default
-                source:
-                  repoURL: https://github.com/flexwie/cluster.git
-                  targetRevision: HEAD
-                  path: apps/root
-                destination:
-                  server: https://kubernetes.default.svc
-                  namespace: apps
-        - name: Add ingress
-          kubernetes.core.k8s:
-            state: present
-            definition:
-              apiVersion: networking.k8s.io/v1
-              kind: Ingress
-              metadata:
-                name: argocd-server-ingress
-                namespace: argocd
-              spec:
-                ingressClassName: tailscale
-                defaultBackend:
-                  service:
-                    name: argocd-server
-                    port:
-                      name: http
-                tls:
-                  - hosts:
-                      - argocd
+        - name: Check preconditions
+          ansible.builtin.command:
+            cmd: flux check --pre
+          failed_when: flux_pre.rc != 0
+          register: flux_pre
+          changed_when: true
+        - name: Collect information
+          block:
+            - name: Get repo
+              ansible.builtin.command:
+                cmd: gh repo view --json name -q .name
+              register: git_repo
+            - name: Get owner
+              ansible.builtin.command:
+                cmd: gh repo view --json owner -q .owner.login
+              register: git_owner
+            - name: Show info
+              ansible.builtin.debug:
+                msg: "owner: {{git_owner.stdout}}; repo: {{git_repo.stdout}}"
+        - name: Bootstrap cluster
+          ansible.builtin.command:
+            cmd: flux bootstrap github --owner={{git_owner.stdout}} --repository={{git_repo.stdout}} --branch=feat/flux --path=./apps --personal
