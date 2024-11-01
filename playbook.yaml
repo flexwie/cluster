@@ -1,8 +1,8 @@
 ---
-- name: Configure k3s
+- name: Configure cluster
   hosts: localhost
   tasks:
-    - name: Host setup
+    - name: Local setup
       tags:
         - setup
       block:
@@ -18,9 +18,9 @@
             - sops
             - kustomize
             - ksops
-        - name: Configure kubeconfig
-          ansible.builtin.shell:
-            cmd: tailscale configure kubeconfig tailscale-operator
+        # - name: Configure kubeconfig
+        #   ansible.builtin.shell:
+        #     cmd: tailscale configure kubeconfig tailscale-operator
     - name: Setup SOPS and age
       ansible.builtin.include_tasks:
         file: tasks/age.yaml
@@ -49,7 +49,7 @@
               register: git_owner
             - name: Show info
               ansible.builtin.debug:
-                msg: "owner: {{git_owner.stdout}}; repo: {{git_repo.stdout}}"
+                msg: "owner: {{ git_owner.stdout }}; repo: {{ git_repo.stdout }}"
         - name: Bootstrap cluster
           ansible.builtin.command:
-            cmd: flux bootstrap github --owner={{git_owner.stdout}} --repository={{git_repo.stdout}} --branch=feat/flux --path=./apps --personal
+            cmd: flux bootstrap github --owner={{ git_owner.stdout }} --repository={{ git_repo.stdout }} --branch=feat/flux --path=./apps --personal
