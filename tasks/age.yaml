@@ -25,5 +25,5 @@
     - name: Add recipients to .envrc
       lineinfile:
         path: .envrc
-        line: "SOPS_AGE_RECIPIENTS=$(<public-age-keys.txt)"
+        line: "export SOPS_AGE_RECIPIENTS=$(<public-age-keys.txt)"
         create: true
