@@ -17,7 +17,7 @@
       shell:
         cmd: age-keygen -y age-key.txt
       register: public_key
-    - name: Add public keyto recipients
+    - name: Add public key to recipients
       lineinfile:
         path: public-age-keys.txt
         line: "{{ public_key.stdout }}"

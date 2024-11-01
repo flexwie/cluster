@@ -17,6 +17,8 @@
             - terraform
             - age
             - sops
+            - kustomize
+            - ksops
         - name: Configure kubeconfig
           ansible.builtin.shell:
             cmd: tailscale configure kubeconfig tailscale-operator
@@ -30,39 +32,88 @@
       tags:
         - argo
       block:
-        - name: Create ArgoCD namespace
-          kubernetes.core.k8s:
-            name: argocd
-            api_version: v1
-            kind: Namespace
-            state: present
-        - name: Get definition
-          ansible.builtin.get_url:
-            url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
-            dest: ./argocd.yml
-            mode: "0777"
         - name: Install ArgoCD
-          kubernetes.core.k8s:
-            src: ./argocd.yml
-            namespace: argocd
-            state: present
-        - name: Remove definition
-          ansible.builtin.file:
-            path: ./argocd.yml
-            state: absent
-        - name: Patch server configuration
-          kubernetes.core.k8s_json_patch:
-            kind: ConfigMap
-            namespace: argocd
-            name: argocd-cmd-params-cm
-            patch:
-              - op: add
-                path: "/data"
-                value: { "server.insecure": "true" }
-          register: config_patch
-        - name: Rollout deployment
-          shell: /bin/bash -c "kubectl rollout restart deployment argocd-server -n argocd"
-          when: config_patch.changed
+          kubernetes.core.helm:
+            name: argo
+            chart_repo_url: "https://argoproj.github.io/argo-helm"
+            release_namespace: argocd
+            create_namespace: true
+            chart_ref: argo-cd
+            values:
+              params:
+                server.insecure: true
+              configs:
+                cm:
+                  kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
+
+              repoServer:
+                volumes:
+                  - name: custom-tools
+                    emptyDir: {}
+
+                initContainers:
+                  - name: install-ksops
+                    image: viaductoss/ksops:v4.3.2
+                    command: ["/bin/sh", "-c"]
+                    args:
+                      - echo "Installing KSOPS...";
+                        mv ksops /custom-tools/;
+                        mv kustomize /custom-tools/;
+                        echo "Done.";
+                    volumeMounts:
+                      - mountPath: /custom-tools
+                        name: custom-tools
+                volumeMounts:
+                  - mountPath: /usr/local/bin/kustomize
+                    name: custom-tools
+                    subPath: kustomize
+                  - mountPath: /usr/local/bin/ksops
+                    name: custom-tools
+                    subPath: ksops
+                # envFrom:
+                #   - secretRef:
+                #       name: test
+
+        # - name: Get definition
+        #   ansible.builtin.get_url:
+        #     url: https://raw.githubusercontent.com/argoproj/argo-cd/stable/manifests/install.yaml
+        #     dest: ./argocd.yml
+        #     mode: "0777"
+        # - name: Install ArgoCD
+        #   kubernetes.core.k8s:
+        #     src: ./argocd.yml
+        #     namespace: argocd
+        #     state: present
+        # - name: Remove definition
+        #   ansible.builtin.file:
+        #     path: ./argocd.yml
+        #     state: absent
+        # - name: Patch server configuration
+        #   kubernetes.core.k8s_json_patch:
+        #     kind: ConfigMap
+        #     namespace: argocd
+        #     name: argocd-cmd-params-cm
+        #     patch:
+        #       - op: add
+        #         path: "/data"
+        #         value: { "server.insecure": "true" }
+        #   register: config_patch
+        # - name: Enable Kustomize options
+        #   ansible.builtin.k8s:
+        #     state: present
+        #     definition:
+        #       apiVersion: v1
+        #       kind: ConfigMap
+        #       metadata:
+        #         name: argocd-cm
+        #         labels:
+        #           app.kubernetes.io/name: argocd-cm
+        #           app.kubernetes.io/part-of: argocd
+        #       data:
+        #         kustomize.buildOptions: "--enable-alpha-plugins --enable-exec"
+        # - name: Rollout deployment
+        #   shell: /bin/bash -c "kubectl rollout restart deployment argocd-server -n argocd"
+        #   when: config_patch.changed
         - name: Deploy app
           kubernetes.core.k8s:
             state: present
